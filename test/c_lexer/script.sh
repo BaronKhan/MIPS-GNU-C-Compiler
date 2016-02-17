@@ -11,4 +11,4 @@ cd ..
 cd ..
 #flex -o ${CPP} ${LEXER}
 #g++ ${CPP} -o ${EXE}
-cat test/lexer/${TEST} | ./${EXE} > test/lexer/out.txt
+cat test/c_lexer/${TEST} | ./${EXE} > test/c_lexer/out.txt
