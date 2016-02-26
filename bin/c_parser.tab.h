@@ -113,16 +113,17 @@
      SIZEOF = 330,
      SHIFTL = 331,
      SHIFTR = 332,
-     ADDASSIGN = 333,
-     SUBASSIGN = 334,
-     MULASSIGN = 335,
-     DIVASSIGN = 336,
-     MODASSIGN = 337,
-     ANDASSIGN = 338,
-     ORASSIGN = 339,
-     XORASSIGN = 340,
-     SHIFTLASSIGN = 341,
-     SHIFTRASSIGN = 342
+     POINTER = 333,
+     ADDASSIGN = 334,
+     SUBASSIGN = 335,
+     MULASSIGN = 336,
+     DIVASSIGN = 337,
+     MODASSIGN = 338,
+     ANDASSIGN = 339,
+     ORASSIGN = 340,
+     XORASSIGN = 341,
+     SHIFTLASSIGN = 342,
+     SHIFTRASSIGN = 343
    };
 #endif
 
@@ -142,7 +143,7 @@ typedef union YYSTYPE
 
 
 /* Line 1685 of yacc.c  */
-#line 146 "bin/c_parser.tab.h"
+#line 147 "bin/c_parser.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -7,5 +7,5 @@ int main() {
         array[2] = .1;
         array[3] = 5.;
 
-        return 0        // we   have finished
+        return 0;        // we   have finished
 }

@@ -34,9 +34,9 @@ int n = 0;
 
 %token 	ADD SUB MUL DIV MOD LEFT RIGHT EQ COMP NOTEQ LTEQ GTEQ GT LT SQUARELEFT SQUARERIGHT PERIOD
 %token 	SCOPELEFT SCOPERIGHT SEMI COLON COMMA INC DEC QUES BWNOT LOGICNOT BWAND LOGICAND BWOR LOGICOR XOR SIZEOF
-%token 	SHIFTL SHIFTR
+%token 	SHIFTL SHIFTR POINTER
 
-%token	ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN SHIFTLASSIGN SHIFTRASSIGN
+%token	ADDASSIGN SUBASSIGN MULASSIGN DIVASSIGN MODASSIGN ANDASSIGN ORASSIGN XORASSIGN SHIFTLASSIGN SHIFTRASSIGN 
 
 /* Non-terminals:
 %type File Function Parameter Block Statement ExprStatement CompoundStatement IfStatement WhileStatement ElseStatement ForStatement
@@ -108,6 +108,7 @@ WhileStatement	:	WHILE LEFT Expr RIGHT Statement
 		
 ForStatement	:	FOR LEFT ExprStatement ExprStatement Expr RIGHT Statement
 		|	FOR LEFT ExprStatement ExprStatement Expr RIGHT Block
+		;
 		
 		
 ReturnStatement	:	RETURN Expr SEMI
@@ -118,21 +119,33 @@ ReturnStatement	:	RETURN Expr SEMI
 		
 
 Expr		:	CompoundType Declaration
+		|	CompoundType MUL Declaration
 		|	Expr COMMA Assignment
 		|	Assignment
 		|	Call
 		;
+
+Assignment	:	Assignment OpAssign UnaryExpr
+		|	Assignment OpAssign ConditionalExpr
+		|	ConditionalExpr
+		|	UnaryExpr
+		;
 		
 ConditionalExpr	:	UnaryExpr OpCond UnaryExpr
 		|	UnaryExpr QUES UnaryExpr COLON UnaryExpr
+		;
 
-UnaryExpr	:	INC UnaryExpr
-		|	UnaryExpr OpManipulate UnaryExpr
+UnaryExpr	:	UnaryExpr OpManipulate UnaryExpr
+		|	INC UnaryExpr
 		|	DEC UnaryExpr
 		|	SIZEOF UnaryExpr
 		|	SIZEOF LEFT Type RIGHT
-		|	OpUnary Cast
+		|	OpUnary UnaryExpr
+		|	Cast UnaryExpr
 		|	PostFixExpr
+		;
+
+Cast		:	LEFT Type RIGHT
 		;
 		
 PostFixExpr	:	PrimaryExpr
@@ -140,7 +153,7 @@ PostFixExpr	:	PrimaryExpr
 		|	PostFixExpr LEFT RIGHT
 		|	PostFixExpr LEFT Argument RIGHT
 		|	PostFixExpr PERIOD IDENTIFIER
-		|	PostFixExpr SUB GT IDENTIFIER
+		|	PostFixExpr POINTER IDENTIFIER
 		|	PostFixExpr INC
 		|	PostFixExpr DEC
 		;
@@ -151,17 +164,16 @@ PrimaryExpr	:	IDENTIFIER
 		;
 
 Declaration	:	IDENTIFIER COMMA Declaration		{indent(n); cout << "VARIABLE : " << $1 << endl;}
+		|	IDENTIFIER ArrayDecl COMMA Declaration	{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		|	IDENTIFIER EQ Expr			{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		|	IDENTIFIER EQ Expr COMMA Declaration	{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		|	IDENTIFIER				{indent(n); cout << "VARIABLE : " << $1 << endl;}
+		|	IDENTIFIER ArrayDecl			{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		;
 		
-
-Assignment	:	Assignment OpAssign UnaryExpr
-		|	Assignment OpAssign ConditionalExpr
-		|	ConditionalExpr
-		|	UnaryExpr
+ArrayDecl	:	SQUARELEFT INTCONST SQUARERIGHT
 		;
+
 
 		
 Call		:	IDENTIFIER LEFT RIGHT
@@ -190,13 +202,19 @@ Type		:	TYPEDEF|CONST| EXTERN|
 /*
 Operator	: 	ADD| SUB| MUL| DIV| MOD| LEFT| RIGHT| EQ| COMP| NOTEQ| LTEQ| GTEQ| GT| LT| SQUARELEFT| SQUARERIGHT|
 			SCOPELEFT| SCOPERIGHT| SEMI| COLON| COMMA| INC| DEC| QUES| BWNOT| LOGICNOT| BWAND| LOGICAND| BWOR| LOGICOR| XOR| SIZEOF|
-			SHIFTL| SHIFTR | ADDASSIGN | SUBASSIGN | MULASSIGN | DIVASSIGN |MODASSIGN |ANDASSIGN |ORASSIGN |XORASSIGN |SHIFTLASSIGN |SHIFTRASSIGN
+			SHIFTL| SHIFTR | ADDASSIGN | SUBASSIGN | MULASSIGN | DIVASSIGN |MODASSIGN |ANDASSIGN |ORASSIGN |XORASSIGN |SHIFTLASSIGN |SHIFTRASSIGN |
+			POINTER
 		;
 */
+
 OpAssign	:	ADDASSIGN | SUBASSIGN | MULASSIGN | DIVASSIGN |MODASSIGN |ANDASSIGN |ORASSIGN |XORASSIGN |SHIFTLASSIGN
 		|	SHIFTRASSIGN | EQ
 		;
 
+
+OpManipulate	:	ADD | SUB | MUL | DIV | MOD | BWNOT | LOGICNOT | BWAND | LOGICAND | BWOR | LOGICOR | XOR
+		|	SHIFTL | SHIFTR
+		;
 		
 OpUnary		:	BWNOT		//~
 		|	LOGICNOT	//!
@@ -206,17 +224,14 @@ OpUnary		:	BWNOT		//~
 		|	MUL
 		;
 		
-OpCond		:	 COMP| NOTEQ| LTEQ| GTEQ| GT| LT
+OpCond		:	COMP| NOTEQ| LTEQ| GTEQ| GT| LT
 		;
 		
-OpManipulate	:	ADD| SUB | MUL| DIV| MOD| BWNOT| LOGICNOT| BWAND| LOGICAND| BWOR| LOGICOR| XOR|
-			SHIFTL| SHIFTR
+
 		
 
 
-Cast		:	LEFT Type RIGHT Cast
-		|	UnaryExpr
-		;
+
 
 %%
 

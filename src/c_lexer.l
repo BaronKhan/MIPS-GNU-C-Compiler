@@ -58,7 +58,9 @@ enum {
 	SCOPELEFT, SCOPERIGHT, SEMI, COLON, COMMA, INC, DEC, QUES, BWNOT, LOGICNOT ,BWAND ,LOGICAND ,BWOR ,LOGICOR ,XOR,
 	SHIFTL, SHIFTR,
 
-	ADDASSIGN ,SUBASSIGN ,MULASSIGN ,DIVASSIGN ,MODASSIGN ,ANDASSIGN ,ORASSIGN, XORASSIGN ,SHIFTLASSIGN ,SHIFTRASSIGN
+	ADDASSIGN ,SUBASSIGN ,MULASSIGN ,DIVASSIGN ,MODASSIGN ,ANDASSIGN ,ORASSIGN, XORASSIGN ,SHIFTLASSIGN ,SHIFTRASSIGN,
+	
+	POINTER
 };
 */
 
@@ -119,7 +121,7 @@ TApost	[']
 
 [#]+[ ]*("include"|"define"|"pragma")[ ]*(.)*"\n"	{line_num++;}
 
-(0x)?{TDigit}+			{/*tokType=yytext;*/ tokType = "TInt"; tokClass = CONSTANT; return INTCONST;}
+(0x[0-9a-fA-F]+)|({TDigit}+)			{/*tokType=yytext;*/ tokType = "TInt"; tokClass = CONSTANT; return INTCONST;}
 {TDigit}+[.]?{TDigit}*([eE][+-]?{TDigit}+)?[flFL]?|{TDigit}*[.]{TDigit}+([eE][+-]?{TDigit}+)?[flFL]? 	{/*tokType=yytext;*/ tokType = "TFloat"; tokClass = CONSTANT; return FLOATCONST;}
 
 
@@ -162,7 +164,7 @@ TApost	[']
 ({TChar}|_)+({TDigit}|{TChar}|_)*	{tokType=yytext; yylval.str = strdup(yytext); tokClass = IDENTIFIER; return IDENTIFIER; }
 
 {TAdd}					{tokType="TAdd";	tokClass = OPERATOR;	return ADD;} 
-{TSub}					{tokType="TSub";	tokClass = OPERATOR;	return SUB;}
+{TSub}					{tokType="TSub"; 	tokClass = OPERATOR;	return SUB;}
 {TMul}					{tokType="TMul";	tokClass = OPERATOR;	return MUL;} 
 {TDiv}					{tokType="TDiv";	tokClass = OPERATOR;	return DIV;}
 {TMod}					{tokType="TMod";	tokClass = OPERATOR;	return MOD;}
@@ -208,6 +210,8 @@ TApost	[']
 {TXOR}{TEq}				{tokType="TXORAssign";	tokClass = OPERATOR;	return XORASSIGN;}
 {TLT}{TLT}{TEq}				{tokType="TShiftLAssign";	tokClass = OPERATOR;	return SHIFTLASSIGN;}
 {TGT}{TGT}{TEq}				{tokType="TShiftRAssign";	tokClass = OPERATOR;	return SHIFTRASSIGN;}
+
+{TSub}{TGT}				{tokType="TPointer";	tokClass = OPERATOR;	return POINTER;}
 
 
 
