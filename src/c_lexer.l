@@ -32,6 +32,36 @@ int srcLine = 1;
 istringstream linemarker;
 bool pre_processed = false;
 
+/*
+enum {
+	CONSTANT=256,
+	IDENTIFIER,
+	KEYWORD,
+	OPERATOR,
+	STRINGLITERAL,
+	INVALID,
+	NEW_LINE,
+	COMMENT,
+	PREPROC,
+	NEWLINE,
+	LINEMARKER,
+	SPACE,
+	
+	
+	INTCONST=300,
+	FLOATCONST,
+	FOR, IF, ELSE, TYPEDEF, WHILE, DO, RETURN, CONST, EXTERN, CONTINUE, DEFAULT, GOTO, SWITCH, 
+	INT, CHAR, FLOAT, DOUBLE, LONG, SHORT, UNSIGNED, VOID, STATIC, REGISTER, BREAK, AUTO, UNION, 
+	ENUM, SIGNED, CASE, VOLATILE, STRUCT, SIZEOF,
+	
+	ADD, SUB, MUL, DIV, MOD, LEFT, RIGHT, EQ, COMP, NOTEQ, LTEQ, GTEQ, GT, LT, SQUARELEFT, SQUARERIGHT,
+	SCOPELEFT, SCOPERIGHT, SEMI, COLON, COMMA, INC, DEC, QUES, BWNOT, LOGICNOT ,BWAND ,LOGICAND ,BWOR ,LOGICOR ,XOR,
+	SHIFTL, SHIFTR,
+
+	ADDASSIGN ,SUBASSIGN ,MULASSIGN ,DIVASSIGN ,MODASSIGN ,ANDASSIGN ,ORASSIGN, XORASSIGN ,SHIFTLASSIGN ,SHIFTRASSIGN
+};
+*/
+
 %}
 
 TDigit	[0-9]
@@ -69,7 +99,7 @@ TApost	[']
 "//"([^\n])+"\n"		{string s=yytext; line_num+=count(s.begin(), s.end(), '\n'); }
 "/*"[^"*/"]*"*/"	{string s=yytext; line_num+=count(s.begin(), s.end(), '\n'); }
 
-{TQuote}[^"]*{TQuote}			{string_count++; /*tokType=yytext;*/ tokType = "TString"; tokClass = STRINGLITERAL; return STRING;}
+{TQuote}(\\.|[^"])*{TQuote}		{string_count++; /*tokType=yytext;*/ tokType = "TString"; tokClass = STRINGLITERAL; return STRING;}
 {TApost}[\\]?[^']{TApost}		{tokType = "TChar"; tokClass = STRINGLITERAL; return STRING;}
 {TApost}([\\]?[^'][^']+)?{TApost}	{tokClass = INVALID; return INVALID;}
 
@@ -152,6 +182,7 @@ TApost	[']
 {TSemi}					{tokType="TSemi"; 	tokClass = OPERATOR;	return SEMI;}
 {TColon}				{tokType="TColon"; 	tokClass = OPERATOR;	return COLON;}
 {TComma}				{tokType="TComma"; 	tokClass = OPERATOR;	return COMMA;}
+{TPeriod}				{tokType="TPeriod"; 	tokClass = OPERATOR;	return PERIOD;}
 {TAdd}{TAdd}			{tokType="TInc"; 	tokClass = OPERATOR;	return INC;}
 {TSub}{TSub}			{tokType="TDec"; 	tokClass = OPERATOR;	return DEC;}
 {TQues}					{tokType="TQues";	tokClass = OPERATOR;	return QUES;}

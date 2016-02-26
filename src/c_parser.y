@@ -32,7 +32,7 @@ int n = 0;
 %token 	INT CHAR FLOAT DOUBLE LONG SHORT UNSIGNED VOID STATIC REGISTER BREAK AUTO UNION 
 %token 	ENUM SIGNED CASE VOLATILE STRUCT
 
-%token 	ADD SUB MUL DIV MOD LEFT RIGHT EQ COMP NOTEQ LTEQ GTEQ GT LT SQUARELEFT SQUARERIGHT
+%token 	ADD SUB MUL DIV MOD LEFT RIGHT EQ COMP NOTEQ LTEQ GTEQ GT LT SQUARELEFT SQUARERIGHT PERIOD
 %token 	SCOPELEFT SCOPERIGHT SEMI COLON COMMA INC DEC QUES BWNOT LOGICNOT BWAND LOGICAND BWOR LOGICOR XOR SIZEOF
 %token 	SHIFTL SHIFTR
 
@@ -48,6 +48,7 @@ int n = 0;
 %start File
 
 %%
+
 
 File		: 	Statement File
 		|	Function File
@@ -117,24 +118,51 @@ ReturnStatement	:	RETURN Expr SEMI
 		
 
 Expr		:	CompoundType Declaration
+		|	Expr COMMA Assignment
 		|	Assignment
 		|	Call
 		;
+		
+ConditionalExpr	:	UnaryExpr OpCond UnaryExpr
+		|	UnaryExpr QUES UnaryExpr COLON UnaryExpr
+
+UnaryExpr	:	INC UnaryExpr
+		|	UnaryExpr OpManipulate UnaryExpr
+		|	DEC UnaryExpr
+		|	SIZEOF UnaryExpr
+		|	SIZEOF LEFT Type RIGHT
+		|	OpUnary Cast
+		|	PostFixExpr
+		;
+		
+PostFixExpr	:	PrimaryExpr
+		|	PostFixExpr SQUARELEFT Expr SQUARERIGHT
+		|	PostFixExpr LEFT RIGHT
+		|	PostFixExpr LEFT Argument RIGHT
+		|	PostFixExpr PERIOD IDENTIFIER
+		|	PostFixExpr SUB GT IDENTIFIER
+		|	PostFixExpr INC
+		|	PostFixExpr DEC
+		;
+		
+PrimaryExpr	:	IDENTIFIER
+		|	Value
+		|	LEFT Expr RIGHT
+		;
 
 Declaration	:	IDENTIFIER COMMA Declaration		{indent(n); cout << "VARIABLE : " << $1 << endl;}
-		|	IDENTIFIER EQ Value COMMA Declaration	{indent(n); cout << "VARIABLE : " << $1 << endl;}
-		|	IDENTIFIER EQ Value			{indent(n); cout << "VARIABLE : " << $1 << endl;}
-		|	IDENTIFIER EQ Call			{indent(n); cout << "VARIABLE : " << $1 << endl;}
+		|	IDENTIFIER EQ Expr			{indent(n); cout << "VARIABLE : " << $1 << endl;}
+		|	IDENTIFIER EQ Expr COMMA Declaration	{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		|	IDENTIFIER				{indent(n); cout << "VARIABLE : " << $1 << endl;}
 		;
 		
 
-Assignment	:	IDENTIFIER Operator Function		
-		|	IDENTIFIER Operator IDENTIFIER
-		|	IDENTIFIER Operator Value
-		|	IDENTIFIER INC
-		|	IDENTIFIER DEC
+Assignment	:	Assignment OpAssign UnaryExpr
+		|	Assignment OpAssign ConditionalExpr
+		|	ConditionalExpr
+		|	UnaryExpr
 		;
+
 		
 Call		:	IDENTIFIER LEFT RIGHT
 		|	IDENTIFIER LEFT Argument RIGHT
@@ -159,12 +187,36 @@ Type		:	TYPEDEF|CONST| EXTERN|
 			INT| CHAR| FLOAT| DOUBLE| LONG| SHORT| UNSIGNED| VOID| STATIC| REGISTER| AUTO| UNION| 
 			ENUM| SIGNED| VOLATILE| STRUCT
 		;
-
+/*
 Operator	: 	ADD| SUB| MUL| DIV| MOD| LEFT| RIGHT| EQ| COMP| NOTEQ| LTEQ| GTEQ| GT| LT| SQUARELEFT| SQUARERIGHT|
 			SCOPELEFT| SCOPERIGHT| SEMI| COLON| COMMA| INC| DEC| QUES| BWNOT| LOGICNOT| BWAND| LOGICAND| BWOR| LOGICOR| XOR| SIZEOF|
 			SHIFTL| SHIFTR | ADDASSIGN | SUBASSIGN | MULASSIGN | DIVASSIGN |MODASSIGN |ANDASSIGN |ORASSIGN |XORASSIGN |SHIFTLASSIGN |SHIFTRASSIGN
 		;
+*/
+OpAssign	:	ADDASSIGN | SUBASSIGN | MULASSIGN | DIVASSIGN |MODASSIGN |ANDASSIGN |ORASSIGN |XORASSIGN |SHIFTLASSIGN
+		|	SHIFTRASSIGN | EQ
+		;
 
+		
+OpUnary		:	BWNOT		//~
+		|	LOGICNOT	//!
+		|	ADD	
+		|	SUB	
+		|	BWAND	//&
+		|	MUL
+		;
+		
+OpCond		:	 COMP| NOTEQ| LTEQ| GTEQ| GT| LT
+		;
+		
+OpManipulate	:	ADD| SUB | MUL| DIV| MOD| BWNOT| LOGICNOT| BWAND| LOGICAND| BWOR| LOGICOR| XOR|
+			SHIFTL| SHIFTR
+		
+
+
+Cast		:	LEFT Type RIGHT Cast
+		|	UnaryExpr
+		;
 
 %%
 
