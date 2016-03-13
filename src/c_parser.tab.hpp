@@ -134,16 +134,24 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 14 "src/c_parser.y"
+#line 19 "src/c_parser.y"
 
 	int num;
 	double fp;
 	char* str;
+	char ch;
+	struct Node* NodePtr;
+	struct Function_Node* Func_NodePtr;
+	struct ID_Node* ID_NodePtr;
+	struct Block_Node* Block_NodePtr;
+	struct Op_Node* Op_NodePtr;
+	struct Type_Node* Type_NodePtr;
+	struct Parameter_Node* Parameter_NodePtr;
 
 
 
 /* Line 1685 of yacc.c  */
-#line 147 "bin/c_parser.tab.h"
+#line 155 "src/c_parser.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

@@ -4,33 +4,57 @@
 
 ## Description
 
-This is a work-in-progress C90 to MIPS32 compiler. Currently only the tokeniser and parser have been completed.
-
+This is a work-in-progress C90 to MIPS compiler. Currently the compiler only produces the MIPS assembly code for function bodies and can only evaluate arithmetic expressions `(+, -, *, /)`. The compiler can accept a maximum of 4 parameters per function.
 ## Usage
 
-Use the makefile to create the parser and input C code into stdin, this will produce a stream of output, indicating the functions and variables that have been declared as well as the current scope.
+Use the makefile to create the code generator and input C code into stdin. This will produce a stream of MIPS assembly code which can be compiled using the MIPS GCC toolchain.
 
 For instance, if the following C code is the input:
 
-    int main() {
-		int x;
-		return 0;
-	}
-	int f(int a, int b) {
-		return a+b;
+    int main(int a, int b) {
+	    int x = 5 + 3;
+	    int y;
+	    y = (a + b) * x;
+	    return y;
 	}
 
-The output will be:
+The MIPS assembly output will be:
 
-	FUNCTION : main
-	SCOPE
-	    VARIABLE : x
-	FUNCTION : f
-	    PARAMETER : a
-	    PARAMETER : b
-	SCOPE
+	main:
+		.frame  $fp,24,$31
+		.mask   0x40000000,-4
+		.fmask  0x00000000,0
+		.set    noreorder
+		.set    nomacro
+		addiu   $sp,$sp,-24
+		sw      $fp,20($sp)
+		move    $fp,$sp
+		sw      $4,20($fp)
+		sw      $5,24($fp)
+		li      $2,8
+		sw      $2,8($fp)
+		move    $2,$0
+		lw      $2,20($fp)
+		lw      $3,24($fp)
+		addu    $2,$2,$3
+		lw      $3,8($fp)
+		mul     $2,$2,$3		# mult, mflo
+		sw      $2,12($fp)
+		move    $2,$0
+		lw      $2,12($fp)
+		move    $sp,$fp
+		lw      $fp,20($sp)
+		addiu   $sp,$sp,24
+		j       $31
+		nop
+	
+		.set    macro
+		.set    reorder
+		.end    main
+		.size   main, .-main
+
 
 
 ## Tests
 
-Run the shell script in the test folder to view the output of all C files in that folder.
+Run the shell script in the test/c_codegen folder to view the output of all C files in the results folder.
