@@ -4,14 +4,14 @@
 
 ## Description
 
-This is a work-in-progress C90 to MIPS compiler. Currently the compiler only produces the MIPS assembly code for function bodies and can only evaluate arithmetic expressions `(+, -, *, /)`. The compiler can accept a maximum of 4 parameters per function.
+This is a work-in-progress C90 to MIPS compiler. Currently the compiler only produces the MIPS assembly code for function bodies and can only evaluate integer arithmetic expressions, `+, -, *, /`.
 ## Usage
 
 Use the makefile to create the code generator and input C code into stdin. This will produce a stream of MIPS assembly code which can be compiled using the MIPS GCC toolchain.
 
 For instance, if the following C code is the input:
 
-    int main(int a, int b) {
+    int function(int a, int b) {
 	    int x = 5 + 3;
 	    int y;
 	    y = (a + b) * x;
@@ -20,7 +20,10 @@ For instance, if the following C code is the input:
 
 The MIPS assembly output will be:
 
-	main:
+		.text
+		.globl  function
+		.ent    function
+	function:
 		.frame  $fp,24,$31
 		.mask   0x40000000,-4
 		.fmask  0x00000000,0
@@ -50,11 +53,12 @@ The MIPS assembly output will be:
 	
 		.set    macro
 		.set    reorder
-		.end    main
-		.size   main, .-main
+		.end    function
+		.size   function, .-function
 
 
 
-## Tests
+
+## Testing
 
 Run the shell script in the test/c_codegen folder to view the output of all C files in the results folder.

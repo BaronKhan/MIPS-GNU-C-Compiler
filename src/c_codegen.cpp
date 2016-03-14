@@ -229,25 +229,31 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 void Assignment_Node::renderASM(Environment& env, std::ostream& out) {
 	//TODO: change for different assignments (+=, -=)
 	if (id->node_type == NODE_ID) {
-		if (value->node_type == NODE_INTCONST) {
-			int n = ((IntConst_Node*)value)->value;
-			out << "\tli      $2," << n << std::endl;
-			out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
-		}
-		else if (value->node_type == NODE_ID) {
-			if (env.symbol_table.find( (((ID_Node*)value)->name ) )  != env.symbol_table.end()) {
-				out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+		if (env.symbol_table.find( (((ID_Node*)id)->name ) )  != env.symbol_table.end()) {
+			if (value->node_type == NODE_INTCONST) {
+				int n = ((IntConst_Node*)value)->value;
+				out << "\tli      $2," << n << std::endl;
 				out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
 			}
-			else {
-				std::cerr << "Error: " << ((ID_Node*)value)->name << " undeclared" << std::endl;
-				exit(EXIT_FAILURE);
+			else if (value->node_type == NODE_ID) {
+				if (env.symbol_table.find( (((ID_Node*)value)->name ) )  != env.symbol_table.end()) {
+					out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				}
+				else {
+					std::cerr << "Error: " << ((ID_Node*)value)->name << " undeclared" << std::endl;
+					exit(EXIT_FAILURE);
+				}
+			}
+			else if (value->node_type == NODE_EXPR) {
+				value->renderASM(env, out);
+				out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				out << "\tmove    $2,$0" << std::endl;
 			}
 		}
-		else if (value->node_type == NODE_EXPR) {
-			value->renderASM(env, out);
-			out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
-			out << "\tmove    $2,$0" << std::endl;
+		else {
+			std::cerr << "Error: " << ((ID_Node*)id)->name << " undeclared" << std::endl;
+			exit(EXIT_FAILURE);
 		}
 	}
 	/*
@@ -354,13 +360,17 @@ void Decl_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 void Block_Node::renderASM(Environment& env, std::ostream& out) {
-	if (block_start != NULL) {
-		block_start->renderASM(env,out);
-	}
-	//nop after if no return statement
-	//out << "\tnop" << std::endl;
+	void restoreTable(const int& old_offset, const	std::map<std::string, int>& old_table);
 	
-	//remove symbols added by block (now out of scope)
+	if (block_start != NULL) {
+		int old_offset;
+		std::map<std::string, int> old_table;
+		env.saveTable(old_offset, old_table);
+		block_start->renderASM(env,out);
+		//remove symbols added by block (now out of scope)
+		env.restoreTable(old_offset, old_table);
+	}
+
 
 }
 
@@ -377,6 +387,12 @@ void Parameter_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 void Function_Node::renderASM(Environment& env, std::ostream& out) {
+	out << "\t.globl  ";
+	f_name->renderASM(env,out);
+	out << std::endl;
+	out << "\t.ent    ";
+	f_name->renderASM(env,out);
+	out << std::endl;
 	f_name->renderASM(env,out);
 	out << ":" << std::endl;
 	//std::cerr << "function has " << variable_count << " variables" << std::endl;
@@ -397,7 +413,9 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 	out << "\tmove    $fp,$sp" << std::endl;		
 	
 	//save current symbol_table (todo)
-	
+	int old_offset;
+	std::map<std::string, int> old_table;
+	env.saveTable(old_offset, old_table);
 	
 	//add parameters (could be NULL) to symbol table
 	//and store parameters onto stack (first four set to $4-$7)
@@ -411,6 +429,8 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 	
 	
 	//remove parameters added by function from symbol table (todo)
+	env.restoreTable(old_offset, old_table);
+	
 	
 	out << "\tmove    $sp,$fp" << std::endl;
 	out << "\tlw      $fp,20($sp)" << std::endl;	
@@ -436,7 +456,8 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 
 void File_Node::renderASM(Environment& env, std::ostream& out) {
 	//out << "\t.file\t1 """ << file_name << """" << std::endl;
-	//out << "\t.ent\t" << ((ID_Node*)f_name)->name << std::endl;
+	out << "\t.text" << std::endl;
+
 	//out << "\t.type\t" << ((ID_Node*)f_name)->name << ", @function" << std::endl;
 	
 	for (int i=0; i<file_list.size(); i++) {

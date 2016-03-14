@@ -1,4 +1,4 @@
-int main(int a, int b) {
+int function(int a, int b) {
     int x = 5 + 3;
     int y;
     y = (a + b) * x;

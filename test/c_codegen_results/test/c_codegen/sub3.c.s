@@ -1,3 +1,6 @@
+	.text
+	.globl  main
+	.ent    main
 main:
 	.frame  $fp,24,$31
 	.mask   0x40000000,-4

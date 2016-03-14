@@ -122,6 +122,7 @@ Parameter	:	CompoundType IDENTIFIER COMMA Parameter	{ID_Node* id = new ID_Node($
 		;
 
 CompoundStatement:	DeclStatement CompoundStatement		{Node* compound = new CompoundStatement_Node($1,$2); $$ = compound;}
+		|	Block CompoundStatement2		{Node* compound = new CompoundStatement_Node($1,$2); $$ = compound;}
 		|	CompoundStatement2			{Node* compound = new CompoundStatement_Node($1,NULL); $$ = compound;}
 		|	DeclStatement				{Node* compound = new CompoundStatement_Node($1,NULL); $$ = compound;}
 		;
@@ -195,13 +196,12 @@ ConditionalExpr	:	UnaryExpr OpCond UnaryExpr
 		;
 
 UnaryExpr	:	UnaryExpr OpManipulate PostFixExpr		{Node* new_node = new Expr_Node($1, $2, $3); $$ = new_node;}
-/*		|	UnaryExpr OpManipulate UnaryExpr		{Node* new_node = new Expr_Node($1, $2, $3); $$ = new_node;}	*/
-		|	INC UnaryExpr
-		|	DEC UnaryExpr
-		|	SIZEOF UnaryExpr
+		|	INC PostFixExpr
+		|	DEC PostFixExpr
+		|	SIZEOF PostFixExpr
 		|	SIZEOF LEFT Type RIGHT
 		|	OpUnary PostFixExpr				{if (strcmp($1,"SUB") == 0) { ($2)->is_negative = true; } $$=$2;}
-		|	Cast UnaryExpr
+		|	Cast PostFixExpr
 		|	PostFixExpr					{$$ = $1;}
 		;
 
@@ -337,8 +337,8 @@ int main(int argc, char* argv[]) {
 	
 	root->renderASM(env, cout);
 	
-	/*
-	Debugging symbol table:
+/*
+	//Debugging symbol table:
 	
 	cout << "symbol table:" << endl;
 	typedef map<string, int>::iterator it_type;
@@ -348,7 +348,7 @@ int main(int argc, char* argv[]) {
 	    cout << iterator->first << ": " << iterator->second << endl;
 	}
 	cout << "-------------" << endl;
-	*/
+*/
 	
 	return 0;
 

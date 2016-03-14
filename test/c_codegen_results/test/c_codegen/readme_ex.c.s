@@ -1,4 +1,7 @@
-main:
+	.text
+	.globl  function
+	.ent    function
+function:
 	.frame  $fp,24,$31
 	.mask   0x40000000,-4
 	.fmask  0x00000000,0
@@ -28,5 +31,5 @@ main:
 
 	.set    macro
 	.set    reorder
-	.end    main
-	.size   main, .-main
+	.end    function
+	.size   function, .-function

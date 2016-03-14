@@ -15,6 +15,27 @@ void Environment::addParameter(std::string name) {
 	symbol_table[name] = scope_start+(param_index*4);		//{variable, fp offset}
 }
 
+void Environment::saveTable(int& old_offset, std::map<std::string, int>& old_table) const {
+	old_table = symbol_table;
+	old_offset = symbol_fp_offset;
+}
+
+void Environment::restoreTable(const int& old_offset, const std::map<std::string, int>& old_table) {
+	symbol_table = old_table;
+	symbol_fp_offset = old_offset;
+}
+
+void Environment::printTable() const {
+	std::cout << "symbol table:" << std::endl;
+	typedef std::map<std::string, int>::const_iterator it_type;
+	for(it_type iterator = symbol_table.begin(); iterator != symbol_table.end(); iterator++) {
+	    // iterator->first = key
+	    // iterator->second = value
+	    std::cout << iterator->first << ": " << iterator->second << std::endl;
+	}
+	std::cout << "-------------" << std::endl;
+}
+
 //NODES
 
 IntConst_Node::IntConst_Node(int n) {

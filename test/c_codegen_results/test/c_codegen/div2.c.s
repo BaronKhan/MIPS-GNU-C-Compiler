@@ -1,3 +1,6 @@
+	.text
+	.globl  divide2
+	.ent    divide2
 divide2:
 	.frame  $fp,24,$31
 	.mask   0x40000000,-4

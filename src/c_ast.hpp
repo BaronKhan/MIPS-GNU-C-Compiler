@@ -30,15 +30,20 @@ enum {
 struct Type_Node;
 
 struct Environment {
-	std::map<std::string, int> global_symbol_table;	//Used for decalrations outside of functions
+	std::map<std::string, int> global_symbol_table;	//Used for declarations outside of functions
 	std::map<std::string, int> symbol_table;		//<variable, fp offset>
+
 	int symbol_fp_offset;					//position of varriable relative to frame pointer
+
 	int scope_start;					//position in stack where current scope variables are located (for later)
 	void addSymbol(std::string name);
 	void addParameter(std::string name);
+	void saveTable(int& old_offset,	std::map<std::string, int>& old_table) const;
+	void restoreTable(const int& old_offset, const	std::map<std::string, int>& old_table);
 	Environment();
 	Type_Node* current_type;
 	int param_index;	//initialise to 0 at start of each function;
+	void printTable() const;
 };
 
 struct Node {
