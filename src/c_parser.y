@@ -60,11 +60,11 @@ int variable_count = 0;		//count the number of variables in function, and increm
 
 
 %type<NodePtr>	File Block Function Statement Expr PrimaryExpr Declaration
-%type<NodePtr>	Assignment Value UnaryExpr PostFixExpr
+%type<NodePtr>	Assignment Value UnaryExpr UnaryExpr2 PostFixExpr
 %type<NodePtr>	ExprStatement ReturnStatement 
 %type<NodePtr> 	DeclStatement CompoundStatement CompoundStatement2
 
-%type<Op_NodePtr>	OpAssign OpManipulate
+%type<Op_NodePtr>	OpAssign OpManipulate OpManipulate2
 
 %type<Type_NodePtr>	CompoundType
 
@@ -195,7 +195,12 @@ ConditionalExpr	:	UnaryExpr OpCond UnaryExpr
 		|	UnaryExpr QUES UnaryExpr COLON UnaryExpr
 		;
 
-UnaryExpr	:	UnaryExpr OpManipulate PostFixExpr		{Node* new_node = new Expr_Node($1, $2, $3); $$ = new_node;}
+UnaryExpr	:	UnaryExpr2					{$$ = $1;}
+		|	UnaryExpr OpManipulate UnaryExpr2		{Node* new_node = new Expr_Node($1, $2, $3); $$ = new_node;}
+		;
+
+
+UnaryExpr2	:	UnaryExpr2 OpManipulate2 PostFixExpr		{Node* new_node = new Expr_Node($1, $2, $3); $$ = new_node;}
 		|	INC PostFixExpr
 		|	DEC PostFixExpr
 		|	SIZEOF PostFixExpr
@@ -271,9 +276,12 @@ OpAssign	: 	ADDASSIGN {Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		;
 
 
-OpManipulate	: 	ADD 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
+OpManipulate	:	ADD 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	SUB 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
-		|	MUL 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
+		;
+
+
+OpManipulate2	: 	MUL 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	DIV 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	MOD 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	BWNOT 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
@@ -286,6 +294,8 @@ OpManipulate	: 	ADD 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	SHIFTL 		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		| 	SHIFTR		{Op_Node* new_node = new Op_Node($1); $$ = new_node;}
 		;
+		
+
 		
 
 		

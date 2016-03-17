@@ -32,14 +32,15 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 
 	/*
 	//Debugging
-	if (lhs->node_type == NODE_INTCONST) out << "lhs is Int Node" << std::endl;
-	if (rhs->node_type == NODE_INTCONST) out << "rhs is Int Node" << std::endl;
-	if (lhs->node_type == NODE_ID) out << "lhs is ID Node" << std::endl;
-	if (rhs->node_type == NODE_ID) out << "rhs is ID Node" << std::endl;
-	if (lhs->node_type == NODE_EXPR) out << "lhs is Expr Node" << std::endl;
-	if (rhs->node_type == NODE_EXPR) out << "rhs is Expr Node" << std::endl;
-	*/
+	if (lhs->node_type == NODE_INTCONST) out << "#lhs is Int Node" << std::endl;
+	if (rhs->node_type == NODE_INTCONST) out << "#rhs is Int Node" << std::endl;
+	if (lhs->node_type == NODE_ID) out << "#lhs is ID Node" << std::endl;
+	if (rhs->node_type == NODE_ID) out << "#rhs is ID Node" << std::endl;
+	if (lhs->node_type == NODE_EXPR) out << "#lhs is Expr Node" << std::endl;
+	if (rhs->node_type == NODE_EXPR) out << "#rhs is Expr Node" << std::endl;
+	out << "#op is " << op->op << std::endl;
 	
+	*/
 	
 	//set lhs
 	if (lhs->node_type == NODE_ID) {
@@ -117,17 +118,17 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 		}
 		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			out << "\taddiu   $2,$2," << value_right << std::endl;
+			out << "\taddi    $2,$2," << value_right << std::endl;
 		}
 		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-			out << "\taddiu   $2,$3," << value_left << std::endl;
+			out << "\taddi    $2,$3," << value_left << std::endl;
 		}
 		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_ID)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_EXPR && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_ID)) {
-			out << "\taddu    $2,$2,$3" << std::endl;
+			out << "\tadd     $2,$2,$3" << std::endl;
 		}
 	}
 	else if (strcmp(op->op, "-") == 0) {
@@ -137,18 +138,18 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 		}
 		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			out << "\taddiu   $2,$2,-" << value_right << std::endl;
+			out << "\taddi    $2,$2,-" << value_right << std::endl;
 		}
 		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
 			out << "\tli      $2," << value_left << std::endl;
-			out << "\tsubu    $2,$2,$3" << std::endl;
+			out << "\tsub     $2,$2,$3" << std::endl;
 		}
 		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_ID)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_EXPR && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_ID)) {
-			out << "\tsubu    $2,$2,$3" << std::endl;
+			out << "\tsub     $2,$2,$3" << std::endl;
 		}
 	}
 	else if (strcmp(op->op, "*") == 0) {
@@ -158,13 +159,15 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 		}
 		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
 			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			//TODO: sort out negative values (just invert sign and sub from 0 at end)
 			if (value_right > 0) {
-				int power = floor(log2(value_right));		//how much to shift by;
+				/*int power = floor(log2(value_right));		//how much to shift by;
 				int remainder = value_right - pow(2,power);	//how much to add by (*2)
 				out << "\tsll     $2,$2," << power << std::endl;
 				if (remainder != 0)
-					out << "\taddiu   $2,$2," << remainder*2 << std::endl;	
+					out << "\taddiu   $2,$2," << remainder*2 << std::endl;
+				*/
+				out << "\tli      $3," << value_right << std::endl;
+				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
 			}
 			else {	//temporary for negative numbers
 				out << "\tli      $3," << value_right << std::endl;
@@ -173,13 +176,16 @@ void Expr_Node::renderASM(Environment& env, std::ostream& out) {
 		}
 		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
 			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-			//TODO: sort out negative values (just invert sign and sub from 0 at end)
 			if (value_left > 0) {
+				/*
 				int power = floor(log2(value_left));		//how much to shift by;
 				int remainder = value_left - pow(2,power);	//how much to add by (*2)
 				out << "\tsll     $3,$3," << power << std::endl;
 				if (remainder != 0)
-					out << "\taddiu   $2,$3," << remainder*2 << std::endl;	
+					out << "\taddiu   $2,$3," << remainder*2 << std::endl;
+				*/
+				out << "\tli      $2," << value_left << std::endl;
+				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
 			}
 			else {	//temporary for negative numbers
 				out << "\tli      $2," << value_left << std::endl;
