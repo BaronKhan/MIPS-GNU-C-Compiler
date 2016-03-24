@@ -22,6 +22,7 @@ It does not currently support the following:
 - advanced control flow (switch, goto)
 - dynamic memory allocation
 - unary or post-fix expressions
+
 ## Usage
 
 Use the makefile to create the compiler using `make bin/c_compiler` and input C code into `stdin`. This will produce a stream of MIPS assembly code which can be compiled using the MIPS GCC toolchain. The input should be C90 and the output is MIPSIV.
