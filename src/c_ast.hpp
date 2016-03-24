@@ -23,20 +23,23 @@ enum {
 	NODE_FILE,
 	NODE_OP,
 	NODE_EXPR,
-	NODE_ASSIGNMENT
+	NODE_ASSIGNMENT,
+	NODE_CALL,
+	NODE_TERNARY
 
 };
 
 struct Type_Node;
 
 struct Environment {
-	std::map<std::string, int> global_symbol_table;	//Used for declarations outside of functions
 	std::map<std::string, int> symbol_table;		//<variable, fp offset>
 
-	int symbol_fp_offset;					//position of varriable relative to frame pointer
+	int symbol_fp_offset;					//position of variable relative to frame pointer
 
 	int scope_start;					//position in stack where current scope variables are located (for later)
 	void addSymbol(std::string name);
+	void addArraySymbol(std::string name, int n);
+	bool findSymbol(const std::string name) const;
 	void addParameter(std::string name);
 	void saveTable(int& old_offset,	std::map<std::string, int>& old_table) const;
 	void restoreTable(const int& old_offset, const	std::map<std::string, int>& old_table);
@@ -44,6 +47,10 @@ struct Environment {
 	Type_Node* current_type;
 	int param_index;	//initialise to 0 at start of each function;
 	void printTable() const;
+	int if_count;
+	int label_count;
+	int arg_count;
+	int global_variable_count;
 };
 
 struct Node {
@@ -62,19 +69,23 @@ struct IntConst_Node: public Node {
 struct FloatConst_Node: public Node {
 	double value;
 	FloatConst_Node(double n);
+	void renderASM(Environment& env, std::ostream& out);
 };
 
 
 struct String_Node: public Node {
 	char* str;
 	String_Node(char* s);
+	void renderASM(Environment& env, std::ostream& out);
 };
 
 
 struct ID_Node: public Node {
 	char* name;
+	Node* array_offset;
 	ID_Node(char* iden);
 	void renderASM(Environment& env, std::ostream& out);
+	void getName(Environment& env, std::ostream& out);
 };
 
 
@@ -92,7 +103,9 @@ struct Decl_Node: public Node {
 	bool has_value;
 	Node* value;
 	Node* next;
+	int size;
 	Decl_Node(Type_Node* t, ID_Node* i, bool has, Node* v, Node* n);
+	Decl_Node(Type_Node* t, ID_Node* i, bool has, Node* v, Node* n, int s);
 	void renderASM(Environment& env, std::ostream& out);
 };
 
@@ -108,7 +121,9 @@ struct DeclStatement_Node: public Node {
 
 struct Op_Node: public Node {
 	char* op;
+	std::string op_prefix;	//used for other assignments, +=, *=, etc.
 	Op_Node(char* o);
+	Op_Node(char* o, std::string o2);
 	void renderASM(Environment& env, std::ostream& out);
 };
 
@@ -118,9 +133,18 @@ struct Expr_Node: public Node {
 	Node* rhs;
 	//Note: check if lhs and rhs are the correct nodes (id, value, expr, etc)
 	Expr_Node(Node* l, Op_Node* oper, Node* r);
-	void renderASM(Environment& env, std::ostream& out);
+	virtual void renderASM(Environment& env, std::ostream& out);
 	//int evalExpr();
 };
+
+struct Ternary_Node: public Node {
+	Node* expr1;
+	Node* expr2;
+	Node* expr3;
+	Ternary_Node(Node* e1, Node* e2, Node* e3);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
 
 struct Assignment_Node: public Node {
 	//just set for one assignment for now (add chaining later)
@@ -131,9 +155,59 @@ struct Assignment_Node: public Node {
 	void renderASM(Environment& env, std::ostream& out);
 };
 
+
+struct Call_Node: public Node {
+	Node* id;
+	Node* args;
+	Call_Node(Node* iden, Node* ar);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+
+struct Argument_Node: public Node {
+	Node* value;
+	Node* next;
+	Argument_Node(Node* v, Node* n);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+
 struct ExprStatement_Node:public Node {
 	Node* expr;
 	ExprStatement_Node(Node* e);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+
+struct IfStatement_Node:public Node {
+	Node* expr;
+	Node* body;
+	Node* else_block;
+	IfStatement_Node(Node* e, Node* b, Node* eb);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+struct WhileStatement_Node:public Node {
+	Node* expr;
+	Node* body;
+	WhileStatement_Node(Node* e, Node* b);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+struct DoWhileStatement_Node:public Node {
+	Node* expr;
+	Node* body;
+	DoWhileStatement_Node(Node* e, Node* b);
+	void renderASM(Environment& env, std::ostream& out);
+};
+
+
+struct ForStatement_Node:public Node {
+	Node* expr1;
+	Node* expr2;
+	Node* expr3;
+	Node* body;
+	ForStatement_Node(Node* e1, Node* e2, Node* e3, Node* b);
 	void renderASM(Environment& env, std::ostream& out);
 };
 

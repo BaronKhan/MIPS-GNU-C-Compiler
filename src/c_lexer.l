@@ -121,7 +121,8 @@ TApost	[']
 
 [#]+[ ]*("include"|"define"|"pragma")[ ]*(.)*"\n"	{line_num++;}
 
-(0x[0-9a-fA-F]+)|({TDigit}+)			{/*tokType=yytext;*/ tokType = "TInt"; tokClass = CONSTANT; yylval.num = atoi(strdup(yytext)); return INTCONST;}
+(0x[0-9a-fA-F]+)		{tokType = "TInt"; tokClass = CONSTANT; yylval.num = (int)(strtol(strdup(yytext),NULL,16)); return INTCONST;}
+({TDigit}+)			{tokType = "TInt"; tokClass = CONSTANT; yylval.num = atoi(strdup(yytext)); return INTCONST;}
 {TDigit}+[.]?{TDigit}*([eE][+-]?{TDigit}+)?[flFL]?|{TDigit}*[.]{TDigit}+([eE][+-]?{TDigit}+)?[flFL]? 	{/*tokType=yytext;*/ tokType = "TFloat"; tokClass = CONSTANT; yylval.fp = atof(strdup(yytext)); return FLOATCONST;}
 
 

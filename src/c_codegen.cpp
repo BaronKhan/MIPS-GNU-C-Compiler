@@ -5,11 +5,47 @@
 #include <cmath>
 
 void IntConst_Node::renderASM(Environment& env, std::ostream& out) {
+	int n = value;
+	if (is_negative)
+		out << "\tli      $2,-" << n << std::endl;
+	else
+		out << "\tli      $2," << n << std::endl;
+
+}
+
+void FloatConst_Node::renderASM(Environment& env, std::ostream& out) {
+	
+
+}
+
+void String_Node::renderASM(Environment& env, std::ostream& out) {
 	
 
 }
 
 void ID_Node::renderASM(Environment& env, std::ostream& out) {
+	if (env.symbol_table.find(name)  != env.symbol_table.end()) {
+		if (array_offset != NULL) {
+			array_offset->renderASM(env,out);
+			out << "\tmove    $8,$2" << std::endl;
+			//$8 contains the index
+			out << "\taddu    $fp,$fp,$8" << std::endl;
+			out << "\tlw      $2," << env.symbol_table[name]<<"($fp)" << std::endl;
+			out << "\tsubu    $fp,$fp,$8" << std::endl;
+		}
+		else {
+			out << "\tlw      $2," << env.symbol_table[name]<<"($fp)" << std::endl;
+		}
+		if (is_negative)
+			out << "\tsubu    $2,0,$2" << std::endl;
+	}
+	else {
+		std::cerr << "Error: " << name << " undeclared" << std::endl;
+		exit(EXIT_FAILURE);
+	}
+}
+
+void ID_Node::getName(Environment& env, std::ostream& out) {
 	out << name;
 }
 
@@ -27,235 +63,143 @@ void Op_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 
-void Expr_Node::renderASM(Environment& env, std::ostream& out) {
-	int value_left, value_right, result;
+//Expr_Node::renderASM() in c_expr.cpp
 
-	/*
-	//Debugging
-	if (lhs->node_type == NODE_INTCONST) out << "#lhs is Int Node" << std::endl;
-	if (rhs->node_type == NODE_INTCONST) out << "#rhs is Int Node" << std::endl;
-	if (lhs->node_type == NODE_ID) out << "#lhs is ID Node" << std::endl;
-	if (rhs->node_type == NODE_ID) out << "#rhs is ID Node" << std::endl;
-	if (lhs->node_type == NODE_EXPR) out << "#lhs is Expr Node" << std::endl;
-	if (rhs->node_type == NODE_EXPR) out << "#rhs is Expr Node" << std::endl;
-	out << "#op is " << op->op << std::endl;
-	
-	*/
-	
-	//set lhs
-	if (lhs->node_type == NODE_ID) {
-		//is identifier on stack?
-		if (env.symbol_table.find( (((ID_Node*)lhs)->name ) )  != env.symbol_table.end()) {
-			out << "\tlw      $2," << env.symbol_table[((ID_Node*)lhs)->name] << "($fp)" << std::endl;
-			if (lhs->is_negative)
-				out << "\tsubu    $2,0,$2" << std::endl;
-		}
-		else {
-			std::cerr << "Error: " << ((ID_Node*)lhs)->name << " undeclared" << std::endl;
-			//exit(EXIT_FAILURE);
-		}
-	}
-	else if (lhs->node_type == NODE_INTCONST) {
-		value_left = ((IntConst_Node*)lhs)->value;
-		if (lhs->is_negative == true)
-			value_left = -value_left;
-	}
-	else if (lhs->node_type == NODE_EXPR) {
-		//save old $3 on stack
-		//out <<"\taddi    $sp,$sp,4" << std::endl;
-		//out <<"\tsw      $3,0($sp)" << std::endl;
-		lhs->renderASM(env, out);
-		if (lhs->is_negative)
-			out << "\tsubu    $2,0,$2" << std::endl;
-		//restore saved $3 from stack
-		//out <<"\tlw      $3,0($sp)" << std::endl;
-		//out <<"\taddi    $sp,$sp,-4" << std::endl;
-	}
-	
-	
-	//set rhs
-	if (rhs->node_type == NODE_ID) {
-		//is identifier on stack?
-		if (env.symbol_table.find( (((ID_Node*)rhs)->name ) )  != env.symbol_table.end()) {
-			out << "\tlw      $3," << env.symbol_table[((ID_Node*)rhs)->name]<<"($fp)" << std::endl;
-			if (rhs->is_negative)
-				out << "\tsubu    $3,0,$3" << std::endl;
-		}
-		else {
-			std::cerr << "Error: " << ((ID_Node*)rhs)->name << " undeclared" << std::endl;
-			exit(EXIT_FAILURE);
-		}
-	}
-	else if (rhs->node_type == NODE_INTCONST) {
-		value_right = ((IntConst_Node*)rhs)->value;
-		if (rhs->is_negative == true)
-			value_right = -value_right;
-	}
-	else if (rhs->node_type == NODE_EXPR) {
-		//save old $2 onto stack
-		out <<"\taddi    $sp,$sp,4" << std::endl;
-		out <<"\tsw      $2,0($sp)		# save $2 onto stack" << std::endl;
-		
-		rhs->renderASM(env, out);
-		if (rhs->is_negative)
-			out << "\tsubu    $2,0,$2" << std::endl;
-		//move result to $3
-		out << "\tmove    $3,$2" << std::endl;
-		
-		//restore saved $2 from stack
-		out <<"\tlw      $2,0($sp)" << std::endl;
-		out <<"\taddi    $sp,$sp,-4" << std::endl;
-	}
-	
-
-	
-
-	//evaluate according to Op node
-	if (strcmp(op->op, "+") == 0) {
-		if (lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_INTCONST) {
-			result = value_left+value_right;
-			out << "\tli      $2," << result << std::endl;
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			out << "\taddi    $2,$2," << value_right << std::endl;
-		}
-		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-			out << "\taddi    $2,$3," << value_left << std::endl;
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_ID)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_EXPR && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_ID)) {
-			out << "\tadd     $2,$2,$3" << std::endl;
-		}
-	}
-	else if (strcmp(op->op, "-") == 0) {
-		if (lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_INTCONST) {
-			result = value_left-value_right;
-			out << "\tli      $2," << result << std::endl;
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			out << "\taddi    $2,$2,-" << value_right << std::endl;
-		}
-		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-			out << "\tli      $2," << value_left << std::endl;
-			out << "\tsub     $2,$2,$3" << std::endl;
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_ID)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_EXPR && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_ID)) {
-			out << "\tsub     $2,$2,$3" << std::endl;
-		}
-	}
-	else if (strcmp(op->op, "*") == 0) {
-		if (lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_INTCONST) {
-			result = value_left*value_right;
-			out << "\tli      $2," << result << std::endl;
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-			if (value_right > 0) {
-				/*int power = floor(log2(value_right));		//how much to shift by;
-				int remainder = value_right - pow(2,power);	//how much to add by (*2)
-				out << "\tsll     $2,$2," << power << std::endl;
-				if (remainder != 0)
-					out << "\taddiu   $2,$2," << remainder*2 << std::endl;
-				*/
-				out << "\tli      $3," << value_right << std::endl;
-				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
-			}
-			else {	//temporary for negative numbers
-				out << "\tli      $3," << value_right << std::endl;
-				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
-			}
-		}
-		else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-			if (value_left > 0) {
-				/*
-				int power = floor(log2(value_left));		//how much to shift by;
-				int remainder = value_left - pow(2,power);	//how much to add by (*2)
-				out << "\tsll     $3,$3," << power << std::endl;
-				if (remainder != 0)
-					out << "\taddiu   $2,$3," << remainder*2 << std::endl;
-				*/
-				out << "\tli      $2," << value_left << std::endl;
-				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
-			}
-			else {	//temporary for negative numbers
-				out << "\tli      $2," << value_left << std::endl;
-				out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
-			}
-		}
-		else if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_ID)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_EXPR && rhs->node_type == NODE_EXPR)
-			|(lhs->node_type == NODE_ID && rhs->node_type == NODE_ID)) {
-			out << "\tmul     $2,$2,$3		# mult, mflo" << std::endl;
-		}
-	}
-	else if (strcmp(op->op, "/") == 0) {
-		if (lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_INTCONST) {
-			result = value_left/value_right;
-			out << "\tli      $2," << result << std::endl;
-		}
-		else {
-			if ((lhs->node_type == NODE_EXPR && rhs->node_type == NODE_INTCONST)
-				|(lhs->node_type == NODE_ID && rhs->node_type == NODE_INTCONST)) {
-				out << "\tli      $3," << value_right << std::endl;
-			}
-			else if ((lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_EXPR)
-				|(lhs->node_type == NODE_INTCONST && rhs->node_type == NODE_ID)) {
-				out << "\tli      $2," << value_right << std::endl;
-			}
-			out << "\tteq     $3,$0,7		# div by 0 exception handler, 7=int div" << std::endl;
-			out << "\tdiv     $2,$3" << std::endl;
-			out << "\tmfhi    $2" <<std::endl;
-			out << "\tmflo    $2" <<std::endl;	//remove when implementing "%"
-		}
-	}
-
-
-
-
-
-}
-
-
+//Ternary_Node::renderASM() in c_expr.cpp
 
 
 
 
 
 void Assignment_Node::renderASM(Environment& env, std::ostream& out) {
-	//TODO: change for different assignments (+=, -=)
+
 	if (id->node_type == NODE_ID) {
 		if (env.symbol_table.find( (((ID_Node*)id)->name ) )  != env.symbol_table.end()) {
+			if (((ID_Node*)id)->array_offset != NULL) {
+				((ID_Node*)id)->array_offset->renderASM(env, out);
+				out << "\tmove    $9,$2" << std::endl;
+				//$9 contains sw array offset
+			}
+			
+			
+			if (op->op_prefix != "") {
+				out << "\tlw      $7," << env.symbol_table[((ID_Node*)id)->name]<<"($fp)" << std::endl;
+			}
+				
 			if (value->node_type == NODE_INTCONST) {
 				int n = ((IntConst_Node*)value)->value;
-				out << "\tli      $2," << n << std::endl;
-				out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				if (value->is_negative)
+					out << "\tli      $2,-" << n << std::endl;
+				else
+					out << "\tli      $2," << n << std::endl;
+				
+				if (((ID_Node*)id)->array_offset == NULL) {
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				}
+				else {
+					out << "\taddu    $fp,$fp,$9" << std::endl;
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					out << "\tsubu    $fp,$fp,$9" << std::endl;
+				}
 			}
 			else if (value->node_type == NODE_ID) {
 				if (env.symbol_table.find( (((ID_Node*)value)->name ) )  != env.symbol_table.end()) {
-					out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
-					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					
+					
+					//out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+					
+					if (((ID_Node*)value)->array_offset != NULL) {
+						((ID_Node*)value)->array_offset->renderASM(env,out);
+						out << "\tmove    $8,$2" << std::endl;
+						//$8 contains the index
+						out << "\taddu    $fp,$fp,$8" << std::endl;
+						out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+						out << "\tsubu    $fp,$fp,$8" << std::endl;
+					}
+					else {
+						out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+					}
+					
+					if (value->is_negative)
+						out << "\tsubu    $2,0,$2" << std::endl;
+						
+					//out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					if (((ID_Node*)id)->array_offset == NULL) {
+						out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					}
+					else {
+						out << "\taddu    $fp,$fp,$9" << std::endl;
+						out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+						out << "\tsubu    $fp,$fp,$9" << std::endl;
+					}
 				}
 				else {
 					std::cerr << "Error: " << ((ID_Node*)value)->name << " undeclared" << std::endl;
 					exit(EXIT_FAILURE);
 				}
 			}
-			else if (value->node_type == NODE_EXPR) {
+			else if (value->node_type == NODE_EXPR || value->node_type == NODE_CALL || value->node_type == NODE_TERNARY) {
 				value->renderASM(env, out);
-				out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				//out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				if (((ID_Node*)id)->array_offset == NULL) {
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				}
+				else {
+					out << "\taddu    $fp,$fp,$9" << std::endl;
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					out << "\tsubu    $fp,$fp,$9" << std::endl;
+				}
 				out << "\tmove    $2,$0" << std::endl;
 			}
+			
+			if (op->op_prefix != "") {
+				if (op->op_prefix == "+") {
+					out << "\taddu    $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "-") {
+					out << "\tsubu    $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "*") {
+					out << "\tmul     $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "/") {
+					out << "\tteq     $2,$0,7		# div by 0 exception handler, 7=int div" << std::endl;
+					out << "\tdivu    $7,$2" << std::endl;
+					out << "\tmfhi    $2" <<std::endl;
+					out << "\tmflo    $2" <<std::endl;
+				}
+				else if (op->op_prefix == "%") {
+					out << "\tteq     $2,$0,7		# div by 0 exception handler, 7=int div" << std::endl;
+					out << "\tdivu    $7,$2" << std::endl;
+					out << "\tmflo    $2" <<std::endl;
+					out << "\tmfhi    $2" <<std::endl;
+				}
+				else if (op->op_prefix == "&") {
+					out << "\tand     $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "|") {
+					out << "\tor      $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "^") {
+					out << "\txor     $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == "<<") {
+					out << "\tsll     $2,$7,$2" << std::endl;
+				}
+				else if (op->op_prefix == ">>") {
+					out << "\tsra     $2,$7,$2" << std::endl;
+				}
+				//out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				if (((ID_Node*)id)->array_offset == NULL) {
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+				}
+				else {
+					out << "\taddu    $fp,$fp,$9" << std::endl;
+					out << "\tsw      $2," << env.symbol_table[((ID_Node*)id)->name] << "($fp)" << std::endl;
+					out << "\tsubu    $fp,$fp,$9" << std::endl;
+				}
+			}
+			
 		}
 		else {
 			std::cerr << "Error: " << ((ID_Node*)id)->name << " undeclared" << std::endl;
@@ -273,9 +217,178 @@ void Assignment_Node::renderASM(Environment& env, std::ostream& out) {
 	}
 }
 
+
+void Call_Node::renderASM(Environment& env, std::ostream& out) {
+	if (!env.findSymbol(((ID_Node*)id)->name)) {
+		std::cerr << "Warning: implicit declaration of function " << ((ID_Node*)id)->name << std::endl;
+	}
+	
+	if (args != NULL) {
+		env.arg_count = 0;
+		args->renderASM(env, out);
+	}
+	out << "\tsw      $31," << env.scope_start-8 << "($sp)" << std::endl;
+	out << "\t.option pic0" << std::endl;
+	out << "\tjal     " << ((ID_Node*)id)->name << std::endl;
+	out << "\tnop" << std::endl << std:: endl;
+	out << "\t.option pic2" << std::endl;
+	out << "\tlw      $31," << env.scope_start-8 << "($sp)" << std::endl;
+	if (is_negative)
+		out << "\tsubu    $2,0,$2" << std::endl;
+
+	
+}
+
+
+void Argument_Node::renderASM(Environment& env, std::ostream& out) {
+	if (value->node_type == NODE_INTCONST) {
+		int n = ((IntConst_Node*)value)->value;
+			if (value->is_negative)
+				out << "\tli      $" << 4+env.arg_count << ",-" << n << std::endl;
+			else
+				out << "\tli      $" << 4+env.arg_count << "," << n << std::endl;
+	}
+	else if (value->node_type == NODE_ID) {
+		if (env.symbol_table.find( (((ID_Node*)value)->name ) )  != env.symbol_table.end()) {
+			//out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+			
+			if (((ID_Node*)value)->array_offset != NULL) {
+				((ID_Node*)value)->array_offset->renderASM(env,out);
+				out << "\tmove    $8,$2" << std::endl;
+				//$8 contains the index
+				out << "\taddu    $fp,$fp,$8" << std::endl;
+				out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+				out << "\tsubu    $fp,$fp,$8" << std::endl;
+			}
+			else {
+				out << "\tlw      $2," << env.symbol_table[((ID_Node*)value)->name]<<"($fp)" << std::endl;
+			}
+			
+			if (value->is_negative)
+				out << "\tsubu    $2,0,$2" << std::endl;
+			out << "\tmove    $" << 4+env.arg_count << ",$2" << std::endl;
+		}
+		else {
+			std::cerr << "Error: " << ((ID_Node*)value)->name << " undeclared" << std::endl;
+			exit(EXIT_FAILURE);
+		}
+	}
+	else if (value->node_type == NODE_EXPR || value->node_type == NODE_CALL || value->node_type == NODE_TERNARY) {
+			value->renderASM(env, out);
+			out << "\tmove    $" << 4+env.arg_count << ",$2" << std::endl;
+	}
+	
+	env.arg_count++;
+	if (next != NULL) {
+		next->renderASM(env, out);
+	}
+
+}
+
+
+
 void ExprStatement_Node::renderASM(Environment& env, std::ostream& out) {
 	expr->renderASM(env, out);
 }
+
+
+void IfStatement_Node::renderASM(Environment& env, std::ostream& out) {
+	int old_count;
+	env.if_count++;
+	if (else_block == NULL) {
+		expr->renderASM(env, out);
+		out << "\tli      $3,1" << std::endl;
+		out << "\tbne     $3,$2,$L" << env.label_count << std::endl;
+		out << "\tnop" << std::endl << std::endl;
+		old_count = env.label_count;
+		env.label_count++;
+		body->renderASM(env,out);
+		env.label_count = old_count;
+		out << "$L" << env.label_count << ":" << std::endl;
+		env.label_count+=env.if_count;
+		env.if_count = 0;
+	}
+	else {
+		expr->renderASM(env, out);
+		out << "\tli      $3,1" << std::endl;
+		out << "\tbne     $3,$2,$L" << env.label_count << std::endl;
+		out << "\tnop" << std::endl << std::endl;
+		old_count = env.label_count;
+		env.label_count+=2;
+		body->renderASM(env, out);
+		env.label_count = old_count;
+		out << "\tb       $L" << env.label_count+1 << std::endl;
+		out << "\tnop" << std::endl << std::endl;
+		out << "$L" << env.label_count << ":" << std::endl;
+		old_count = env.label_count;
+		env.label_count+=2;
+		else_block->renderASM(env, out);
+		env.label_count = old_count;
+		out << "$L" << env.label_count+1 << ":" << std::endl;
+		env.label_count+=(2*env.if_count);
+		env.if_count = 0;
+	}
+}
+
+
+void WhileStatement_Node::renderASM(Environment& env, std::ostream& out) {
+	int old_count, diff;
+	out << "\tb       $L" << env.label_count << std::endl;
+	out << "\tnop" << std::endl <<std::endl;
+	out << "$L" << env.label_count+1 << ":" << std::endl;
+	old_count = env.label_count;
+	env.label_count+=2;
+	body->renderASM(env, out);
+	diff = env.label_count - old_count;
+	env.label_count = old_count;
+	out << "$L" << env.label_count << ":" << std::endl;
+	expr->renderASM(env, out);
+	out << "\tli      $3,0" << std::endl;
+	out << "\tbne     $2,$3,$L" << env.label_count+1 << std::endl;
+	out << "\tnop" << std::endl <<std::endl;
+	env.label_count+=2+(2*diff);
+}
+
+void DoWhileStatement_Node::renderASM(Environment& env, std::ostream& out) {
+	int old_count, diff;
+	//out << "\tb       $L" << env.label_count << std::endl;
+	//out << "\tnop" << std::endl <<std::endl;
+	out << "$L" << env.label_count+1 << ":" << std::endl;
+	old_count = env.label_count;
+	env.label_count+=2;
+	body->renderASM(env, out);
+	diff = env.label_count - old_count;
+	env.label_count = old_count;
+	out << "$L" << env.label_count << ":" << std::endl;
+	expr->renderASM(env, out);
+	out << "\tli      $3,0" << std::endl;
+	out << "\tbne     $2,$3,$L" << env.label_count+1 << std::endl;
+	out << "\tnop" << std::endl <<std::endl;
+	env.label_count+=2+(2*diff);
+}
+
+void ForStatement_Node::renderASM(Environment& env, std::ostream& out) {
+	int old_count, diff;
+	expr1->renderASM(env, out);
+	out << "\tb       $L" << env.label_count << std::endl;
+	out << "\tnop" << std::endl << std::endl;
+	out << "$L" << env.label_count+1 << ":" << std::endl;
+	//execute body and then expr3
+	old_count = env.label_count;
+	env.label_count += 2;
+	body->renderASM(env,out);
+	diff = env.label_count - old_count;
+	env.label_count = old_count;
+	expr3->renderASM(env,out);
+	out << "$L" << env.label_count << ":" << std::endl;
+	//check expr2
+	expr2->renderASM(env, out);
+	out << "\tli      $3,0" << std::endl;
+	out << "\tbne     $2,$3,$L" << env.label_count+1 << std::endl;
+	out << "\tnop" << std::endl <<std::endl;
+	env.label_count+=2+(2*diff);
+}
+
 
 void ReturnStatement_Node::renderASM(Environment& env, std::ostream& out) {
 	//store return value in $2;
@@ -289,7 +402,20 @@ void ReturnStatement_Node::renderASM(Environment& env, std::ostream& out) {
 		}
 		else if (return_expr->node_type == NODE_ID) {
 			if (env.symbol_table.find( (((ID_Node*)return_expr)->name ) )  != env.symbol_table.end()) {
-				out << "\tlw      $2," << env.symbol_table[((ID_Node*)return_expr)->name]<<"($fp)" << std::endl;
+				//out << "\tlw      $2," << env.symbol_table[((ID_Node*)return_expr)->name]<<"($fp)" << std::endl;
+				
+				if (((ID_Node*)return_expr)->array_offset != NULL) {
+					((ID_Node*)return_expr)->array_offset->renderASM(env,out);
+					out << "\tmove    $8,$2" << std::endl;
+					//$8 contains the index
+					out << "\taddu    $fp,$fp,$8" << std::endl;
+					out << "\tlw      $2," << env.symbol_table[((ID_Node*)return_expr)->name]<<"($fp)" << std::endl;
+					out << "\tsubu    $fp,$fp,$8" << std::endl;
+				}
+				else {
+					out << "\tlw      $2," << env.symbol_table[((ID_Node*)return_expr)->name]<<"($fp)" << std::endl;
+				}
+				
 				if (return_expr->is_negative)
 					out << "\tsubu    $2,0,$2" << std::endl;
 			}
@@ -298,10 +424,8 @@ void ReturnStatement_Node::renderASM(Environment& env, std::ostream& out) {
 				exit(EXIT_FAILURE);
 			}
 		}
-		else if (return_expr->node_type == NODE_EXPR) {
+		else {
 			return_expr->renderASM(env, out);
-			if (return_expr->is_negative)
-					out << "\tsubu    $2,0,$2" << std::endl;
 		}
 	}
 }
@@ -325,8 +449,13 @@ void DeclStatement_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 void Decl_Node::renderASM(Environment& env, std::ostream& out) {
-	//assign a register`
-	env.addSymbol(id->name);
+	//assign a register
+	if (size > 1) {
+		env.addArraySymbol(id->name, size);
+	}
+	else {
+		env.addSymbol(id->name);
+	}
 	if (has_value) {
 		if (value->node_type == NODE_INTCONST) {
 			int n = ((IntConst_Node*)value)->value;
@@ -348,13 +477,11 @@ void Decl_Node::renderASM(Environment& env, std::ostream& out) {
 				exit(EXIT_FAILURE);
 			}
 		}
-		else if (value->node_type == NODE_EXPR) {
+		else {
 			//evaluate expression using $2 and $3 and store final result in $2
 			//out << "EVALUATING EXPRESSION" <<std::endl;
 			value->renderASM(env, out);
 			//out << std::endl;
-			if (value->is_negative)
-				out << "\tsubu    $2,$0,$2" << std::endl;
 			out << "\tsw      $2," << env.symbol_table[id->name] << "($fp)" << std::endl;
 			out << "\tmove    $2,$0" << std::endl;
 		}
@@ -366,7 +493,7 @@ void Decl_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 void Block_Node::renderASM(Environment& env, std::ostream& out) {
-	void restoreTable(const int& old_offset, const	std::map<std::string, int>& old_table);
+	//void restoreTable(const int& old_offset, const	std::map<std::string, int>& old_table);
 	
 	if (block_start != NULL) {
 		int old_offset;
@@ -393,23 +520,29 @@ void Parameter_Node::renderASM(Environment& env, std::ostream& out) {
 }
 
 void Function_Node::renderASM(Environment& env, std::ostream& out) {
+	out << "\t.align  2" << std::endl;
 	out << "\t.globl  ";
-	f_name->renderASM(env,out);
+	f_name->getName(env,out);
 	out << std::endl;
+	out << "\t.set    nomips16" << std::endl;
+        //out << "\t.set    nomicromips" << std::endl;
 	out << "\t.ent    ";
-	f_name->renderASM(env,out);
+	f_name->getName(env,out);
 	out << std::endl;
-	f_name->renderASM(env,out);
+	out << "\t.type\t" << ((ID_Node*)f_name)->name << ", @function" << std::endl;
+	f_name->getName(env,out);
 	out << ":" << std::endl;
 	//std::cerr << "function has " << variable_count << " variables" << std::endl;
 	
+	variable_count += env.global_variable_count;
+	
 	if (variable_count >= 3) {
-		env.scope_start = 16+(variable_count*4);
+		env.scope_start += (variable_count*4);
 	}
 	else {
-		env.scope_start = 20;
+		env.scope_start += 4;
 	}
-	out << "\t.frame  $fp,24,$31" << std::endl;
+	out << "\t.frame  $fp," << env.scope_start+4 << ",$31" << std::endl;
 	out << "\t.mask   0x40000000,-4" << std::endl;
 	out << "\t.fmask  0x00000000,0" << std::endl;
 	out << "\t.set    noreorder" << std::endl;
@@ -417,6 +550,11 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 	out << "\taddiu   $sp,$sp,-" << env.scope_start+4 << std::endl;
 	out << "\tsw      $fp," << env.scope_start << "($sp)" << std::endl;
 	out << "\tmove    $fp,$sp" << std::endl;		
+	
+	//add function name to symbol table
+	if (!env.findSymbol(((ID_Node*)f_name)->name)) {
+		env.addSymbol(((ID_Node*)f_name)->name);
+	}
 	
 	//save current symbol_table (todo)
 	int old_offset;
@@ -439,8 +577,8 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 	
 	
 	out << "\tmove    $sp,$fp" << std::endl;
-	out << "\tlw      $fp,20($sp)" << std::endl;	
-	out << "\taddiu   $sp,$sp,24" << std::endl;
+	out << "\tlw      $fp," << env.scope_start << "($sp)" << std::endl;	
+	out << "\taddiu   $sp,$sp," << env.scope_start+4 << std::endl;
 	out << "\tj       $31" << std::endl;
 	out << "\tnop" << std::endl;
 	out << std::endl;
@@ -448,13 +586,16 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 	out << "\t.set    macro" << std::endl;
         out << "\t.set    reorder" << std::endl;
         out << "\t.end    ";
-	f_name->renderASM(env,out);
+	f_name->getName(env,out);
 	out << std::endl;
         out << "\t.size   ";
-	f_name->renderASM(env,out);
+	f_name->getName(env,out);
 	out << ", .-";
-	f_name->renderASM(env,out);
+	f_name->getName(env,out);
 	out << std::endl;
+	
+	//increment next fp start to not conflict during function calls
+	env.scope_start += 20;
 	
 	
 }
@@ -462,11 +603,16 @@ void Function_Node::renderASM(Environment& env, std::ostream& out) {
 
 void File_Node::renderASM(Environment& env, std::ostream& out) {
 	//out << "\t.file\t1 """ << file_name << """" << std::endl;
+	out << "\t.section .mdebug.abi32" << std::endl;
+        out << "\t.previous" << std::endl;
+	//out << "\t.nan    legacy" << std::endl;
+        //out << "\t.module fp=xx" << std::endl;
+        //out << "\t.module nooddspreg" << std::endl;
+	out << "\t.abicalls" << std::endl;
 	out << "\t.text" << std::endl;
-
-	//out << "\t.type\t" << ((ID_Node*)f_name)->name << ", @function" << std::endl;
 	
-	for (int i=0; i<file_list.size(); i++) {
+	
+	for (int i=file_list.size()-1; i>=0; i--) {
 		(file_list[i])->renderASM(env, out);
 	}
 	//out << "end" << std::endl;

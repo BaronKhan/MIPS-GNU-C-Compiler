@@ -134,7 +134,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1685 of yacc.c  */
-#line 19 "src/c_parser.y"
+#line 20 "src/c_parser.y"
 
 	int num;
 	double fp;
@@ -147,11 +147,12 @@ typedef union YYSTYPE
 	struct Op_Node* Op_NodePtr;
 	struct Type_Node* Type_NodePtr;
 	struct Parameter_Node* Parameter_NodePtr;
+	struct Call_Node* Call_NodePtr;
 
 
 
 /* Line 1685 of yacc.c  */
-#line 155 "src/c_parser.tab.hpp"
+#line 156 "src/c_parser.tab.hpp"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

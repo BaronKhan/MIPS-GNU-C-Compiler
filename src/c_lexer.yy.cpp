@@ -372,8 +372,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 91
-#define YY_END_OF_BUFFER 92
+#define YY_NUM_RULES 92
+#define YY_END_OF_BUFFER 93
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -383,35 +383,35 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[268] =
     {   0,
-        0,    0,   92,   90,   89,   88,   69,   90,   90,   47,
-       70,   90,   48,   49,   45,   43,   63,   44,   64,   46,
-        8,    8,   62,   61,   56,   50,   55,   67,   42,   57,
-       58,   74,   42,   42,   42,   42,   42,   42,   42,   42,
-       42,   42,   42,   42,   42,   42,   42,   59,   72,   60,
-       68,   52,    0,    3,    0,    0,    0,    0,    0,    0,
-        0,   81,   71,   82,    0,    5,    0,   79,   65,   77,
-       66,   78,   87,    9,    0,    0,   80,    9,    8,    0,
-        9,    0,   75,   53,   51,   54,   76,   42,   42,   84,
-       42,   42,   42,   42,   42,   42,   15,   42,   42,   42,
+        0,    0,   93,   91,   90,   89,   70,   91,   91,   48,
+       71,   91,   49,   50,   46,   44,   64,   45,   65,   47,
+        9,    9,   63,   62,   57,   51,   56,   68,   43,   58,
+       59,   75,   43,   43,   43,   43,   43,   43,   43,   43,
+       43,   43,   43,   43,   43,   43,   43,   60,   73,   61,
+       69,   53,    0,    3,    0,    0,    0,    0,    0,    0,
+        0,   82,   72,   83,    0,    5,    0,   80,   66,   78,
+       67,   79,   88,   10,    0,    0,   81,   10,    9,    0,
+       10,    0,   76,   54,   52,   55,   77,   43,   43,   85,
+       43,   43,   43,   43,   43,   43,   16,   43,   43,   43,
 
-       42,   42,   42,   11,   42,   42,   42,   42,   42,   42,
-       42,   42,   42,   42,   42,   83,   73,    0,    3,    0,
-        0,    0,    0,    0,    0,    0,    4,    0,    0,    9,
-        0,    0,    0,    9,    0,    9,    8,   85,   86,   42,
-       42,   42,   42,   42,   42,   42,   42,   42,   42,   42,
-       10,   42,   23,   42,   42,   42,   42,   42,   42,   42,
-       42,   42,   42,   42,   42,   42,   42,   42,    0,    6,
-        0,    0,    0,    4,    0,    9,    2,    1,    0,   34,
-       42,   38,   24,   42,   42,   42,   42,   12,   36,   42,
-       42,   21,   27,   42,   42,   42,   42,   42,   42,   42,
+       43,   43,   43,   12,   43,   43,   43,   43,   43,   43,
+       43,   43,   43,   43,   43,   84,   74,    0,    3,    0,
+        0,    0,    0,    0,    0,    0,    4,    0,    0,   10,
+        0,    0,    0,   10,    0,   10,    8,   86,   87,   43,
+       43,   43,   43,   43,   43,   43,   43,   43,   43,   43,
+       11,   43,   24,   43,   43,   43,   43,   43,   43,   43,
+       43,   43,   43,   43,   43,   43,   43,   43,    0,    6,
+        0,    0,    0,    4,    0,   10,    2,    1,    0,   35,
+       43,   39,   25,   43,   43,   43,   43,   13,   37,   43,
+       43,   22,   28,   43,   43,   43,   43,   43,   43,   43,
 
-       42,   42,   42,   42,   30,   42,   42,    0,    6,    0,
-        0,    0,    0,    9,   33,   17,   42,   42,   42,   42,
-       25,   42,   42,   28,   42,   42,   42,   42,   42,   42,
-       35,   42,   42,   14,    0,    0,    0,   42,   42,   26,
-       18,   42,   16,   37,   41,   31,   40,   22,   42,   42,
-       42,    0,    0,   42,   20,   42,   13,   42,   42,    0,
-        7,    0,   19,   32,   29,   39,    0
+       43,   43,   43,   43,   31,   43,   43,    0,    6,    0,
+        0,    0,    0,   10,   34,   18,   43,   43,   43,   43,
+       26,   43,   43,   29,   43,   43,   43,   43,   43,   43,
+       36,   43,   43,   15,    0,    0,    0,   43,   43,   27,
+       19,   43,   17,   38,   42,   32,   41,   23,   43,   43,
+       43,    0,    0,   43,   21,   43,   14,   43,   43,    0,
+        7,    0,   20,   33,   30,   40,    0
     } ;
 
 static yyconst flex_int32_t yy_ec[256] =
@@ -1124,425 +1124,430 @@ YY_RULE_SETUP
 case 8:
 YY_RULE_SETUP
 #line 124 "src/c_lexer.l"
-{/*tokType=yytext;*/ tokType = "TInt"; tokClass = CONSTANT; yylval.num = atoi(strdup(yytext)); return INTCONST;}
+{tokType = "TInt"; tokClass = CONSTANT; yylval.num = (int)(strtol(strdup(yytext),NULL,16)); return INTCONST;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
 #line 125 "src/c_lexer.l"
-{/*tokType=yytext;*/ tokType = "TFloat"; tokClass = CONSTANT; yylval.fp = atof(strdup(yytext)); return FLOATCONST;}
+{tokType = "TInt"; tokClass = CONSTANT; yylval.num = atoi(strdup(yytext)); return INTCONST;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 128 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return FOR; }
+#line 126 "src/c_lexer.l"
+{/*tokType=yytext;*/ tokType = "TFloat"; tokClass = CONSTANT; yylval.fp = atof(strdup(yytext)); return FLOATCONST;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
 #line 129 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return IF; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return FOR; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
 #line 130 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return ELSE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return IF; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
 #line 131 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return TYPEDEF; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return ELSE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
 #line 132 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return WHILE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return TYPEDEF; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 133 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DO; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return WHILE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 134 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return RETURN; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DO; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 135 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CONST; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return RETURN; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 136 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return EXTERN; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CONST; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 137 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CONTINUE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return EXTERN; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 138 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DEFAULT; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CONTINUE; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 139 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return GOTO; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DEFAULT; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 140 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SWITCH; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return GOTO; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 141 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return INT; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SWITCH; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 142 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CHAR; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return INT; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 143 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return FLOAT; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CHAR; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 144 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DOUBLE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return FLOAT; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 145 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return LONG; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return DOUBLE; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
 #line 146 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SHORT; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return LONG; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
 #line 147 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return UNSIGNED; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SHORT; }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
 #line 148 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return VOID; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return UNSIGNED; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
 #line 149 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return STATIC; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return VOID; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
 #line 150 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return REGISTER; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return STATIC; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
 #line 151 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return BREAK; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return REGISTER; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
 #line 152 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return AUTO; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return BREAK; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
 #line 153 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return UNION; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return AUTO; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 155 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return ENUM; }
+#line 154 "src/c_lexer.l"
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return UNION; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
 #line 156 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SIGNED; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return ENUM; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
 #line 157 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CASE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return SIGNED; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
 #line 158 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return VOLATILE; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return CASE; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
 #line 159 "src/c_lexer.l"
-{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return STRUCT; }
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return VOLATILE; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 161 "src/c_lexer.l"
-{tokType="Tsizeof"; tokClass = OPERATOR; return SIZEOF; }
+#line 160 "src/c_lexer.l"
+{ tokType=yytext; tokClass = KEYWORD; yylval.str = strdup(yytext); return STRUCT; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 164 "src/c_lexer.l"
-{tokType=yytext; yylval.str = strdup(yytext); tokClass = IDENTIFIER; return IDENTIFIER; }
+#line 162 "src/c_lexer.l"
+{tokType="Tsizeof"; tokClass = OPERATOR; return SIZEOF; }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 166 "src/c_lexer.l"
-{tokType="TAdd";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ADD;} 
+#line 165 "src/c_lexer.l"
+{tokType=yytext; yylval.str = strdup(yytext); tokClass = IDENTIFIER; return IDENTIFIER; }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
 #line 167 "src/c_lexer.l"
-{tokType="TSub"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SUB;}
+{tokType="TAdd";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ADD;} 
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
 #line 168 "src/c_lexer.l"
-{tokType="TMul";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MUL;} 
+{tokType="TSub"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SUB;}
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
 #line 169 "src/c_lexer.l"
-{tokType="TDiv";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return DIV;}
+{tokType="TMul";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MUL;} 
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
 #line 170 "src/c_lexer.l"
-{tokType="TMod";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MOD;}
+{tokType="TDiv";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return DIV;}
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
 #line 171 "src/c_lexer.l"
-{tokType="TLeft";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LEFT;}
+{tokType="TMod";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MOD;}
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
 #line 172 "src/c_lexer.l"
-{tokType="TRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return RIGHT;}
+{tokType="TLeft";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LEFT;}
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
 #line 173 "src/c_lexer.l"
-{tokType="TEq";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return EQ;}
+{tokType="TRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return RIGHT;}
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
 #line 174 "src/c_lexer.l"
-{tokType="TComp";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return COMP;}
+{tokType="TEq";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return EQ;}
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
 #line 175 "src/c_lexer.l"
-{tokType="TNotEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return NOTEQ;}
+{tokType="TComp";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return COMP;}
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
 #line 176 "src/c_lexer.l"
-{tokType="TLTEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LTEQ;}
+{tokType="TNotEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return NOTEQ;}
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
 #line 177 "src/c_lexer.l"
-{tokType="TGTEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return GTEQ;}
+{tokType="TLTEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LTEQ;}
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
 #line 178 "src/c_lexer.l"
-{tokType="TGT";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return GT;}
+{tokType="TGTEq";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return GTEQ;}
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
 #line 179 "src/c_lexer.l"
-{tokType="TLT";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LT;}
+{tokType="TGT";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return GT;}
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
 #line 180 "src/c_lexer.l"
-{tokType="TSquareLeft"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SQUARELEFT;}
+{tokType="TLT";		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LT;}
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
 #line 181 "src/c_lexer.l"
-{tokType="TSquareRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SQUARERIGHT;}
+{tokType="TSquareLeft"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SQUARELEFT;}
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
 #line 182 "src/c_lexer.l"
-{tokType="TScopeLeft"; 		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SCOPELEFT;}
+{tokType="TSquareRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SQUARERIGHT;}
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
 #line 183 "src/c_lexer.l"
-{tokType="TScopeRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SCOPERIGHT;}
+{tokType="TScopeLeft"; 		tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SCOPELEFT;}
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
 #line 184 "src/c_lexer.l"
-{tokType="TSemi"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return SEMI;}
+{tokType="TScopeRight"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SCOPERIGHT;}
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
 #line 185 "src/c_lexer.l"
-{tokType="TColon"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return COLON;}
+{tokType="TSemi"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return SEMI;}
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
 #line 186 "src/c_lexer.l"
-{tokType="TComma"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return COMMA;}
+{tokType="TColon"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return COLON;}
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
 #line 187 "src/c_lexer.l"
-{tokType="TPeriod"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return PERIOD;}
+{tokType="TComma"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return COMMA;}
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
 #line 188 "src/c_lexer.l"
-{tokType="TInc"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return INC;}
+{tokType="TPeriod"; 	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return PERIOD;}
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
 #line 189 "src/c_lexer.l"
-{tokType="TDec"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return DEC;}
+{tokType="TInc"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return INC;}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
 #line 190 "src/c_lexer.l"
-{tokType="TQues";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return QUES;}
+{tokType="TDec"; 	tokClass = OPERATOR;		yylval.str = strdup(yytext);return DEC;}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 192 "src/c_lexer.l"
-{tokType="TBWNOT";	tokClass = OPERATOR;		yylval.str = strdup(yytext); return BWNOT;}
+#line 191 "src/c_lexer.l"
+{tokType="TQues";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return QUES;}
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
 #line 193 "src/c_lexer.l"
-{tokType="TLogicNOT";	tokClass = OPERATOR;		yylval.str = strdup(yytext); return LOGICNOT;}
+{tokType="TBWNOT";	tokClass = OPERATOR;		yylval.str = strdup(yytext); return BWNOT;}
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
 #line 194 "src/c_lexer.l"
-{tokType="TBWAND";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return BWAND;}
+{tokType="TLogicNOT";	tokClass = OPERATOR;		yylval.str = strdup(yytext); return LOGICNOT;}
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
 #line 195 "src/c_lexer.l"
-{tokType="TLogicAND";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LOGICAND;}
+{tokType="TBWAND";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return BWAND;}
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
 #line 196 "src/c_lexer.l"
-{tokType="TBWOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return BWOR;}
+{tokType="TLogicAND";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LOGICAND;}
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
 #line 197 "src/c_lexer.l"
-{tokType="TLogicOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LOGICOR;}
+{tokType="TBWOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return BWOR;}
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
 #line 198 "src/c_lexer.l"
-{tokType="TXOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return XOR;}
+{tokType="TLogicOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return LOGICOR;}
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 200 "src/c_lexer.l"
-{tokType="TShiftL";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTL;}
+#line 199 "src/c_lexer.l"
+{tokType="TXOR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return XOR;}
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
 #line 201 "src/c_lexer.l"
-{tokType="TShiftR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTR;}
+{tokType="TShiftL";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTL;}
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 203 "src/c_lexer.l"
-{tokType="TAddAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ADDASSIGN;}
+#line 202 "src/c_lexer.l"
+{tokType="TShiftR";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTR;}
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
 #line 204 "src/c_lexer.l"
-{tokType="TSubAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SUBASSIGN;}
+{tokType="TAddAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ADDASSIGN;}
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
 #line 205 "src/c_lexer.l"
-{tokType="TMulAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MULASSIGN;}
+{tokType="TSubAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SUBASSIGN;}
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
 #line 206 "src/c_lexer.l"
-{tokType="TDivAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return DIVASSIGN;}
+{tokType="TMulAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MULASSIGN;}
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
 #line 207 "src/c_lexer.l"
-{tokType="TModAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MODASSIGN;}
+{tokType="TDivAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return DIVASSIGN;}
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
 #line 208 "src/c_lexer.l"
-{tokType="TANDAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ANDASSIGN;}
+{tokType="TModAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return MODASSIGN;}
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
 #line 209 "src/c_lexer.l"
-{tokType="TORAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ORASSIGN;}
+{tokType="TANDAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ANDASSIGN;}
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
 #line 210 "src/c_lexer.l"
-{tokType="TXORAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return XORASSIGN;}
+{tokType="TORAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return ORASSIGN;}
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
 #line 211 "src/c_lexer.l"
-{tokType="TShiftLAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTLASSIGN;}
+{tokType="TXORAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return XORASSIGN;}
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
 #line 212 "src/c_lexer.l"
-{tokType="TShiftRAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTRASSIGN;}
+{tokType="TShiftLAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTLASSIGN;}
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 214 "src/c_lexer.l"
-{tokType="TPointer";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return POINTER;}
+#line 213 "src/c_lexer.l"
+{tokType="TShiftRAssign";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return SHIFTRASSIGN;}
 	YY_BREAK
 case 88:
-/* rule 88 can match eol */
 YY_RULE_SETUP
-#line 218 "src/c_lexer.l"
-{line_num++; if(pre_processed){srcLine++;}}
+#line 215 "src/c_lexer.l"
+{tokType="TPointer";	tokClass = OPERATOR;	yylval.str = strdup(yytext);	return POINTER;}
 	YY_BREAK
 case 89:
+/* rule 89 can match eol */
 YY_RULE_SETUP
 #line 219 "src/c_lexer.l"
-{/*ignore spaces and tabs*/}
+{line_num++; if(pre_processed){srcLine++;}}
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 222 "src/c_lexer.l"
-{tokClass = INVALID; return INVALID;}
+#line 220 "src/c_lexer.l"
+{/*ignore spaces and tabs*/}
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 225 "src/c_lexer.l"
+#line 223 "src/c_lexer.l"
+{tokClass = INVALID; return INVALID;}
+	YY_BREAK
+case 92:
+YY_RULE_SETUP
+#line 226 "src/c_lexer.l"
 ECHO;
 	YY_BREAK
-#line 1546 "src/c_lexer.yy.cpp"
+#line 1551 "src/c_lexer.yy.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2540,7 +2545,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 225 "src/c_lexer.l"
+#line 226 "src/c_lexer.l"
 
 
 
