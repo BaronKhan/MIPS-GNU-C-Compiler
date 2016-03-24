@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Language Processors 2015 CW - bak14
 
 --- 
