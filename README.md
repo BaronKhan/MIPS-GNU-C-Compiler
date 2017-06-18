@@ -1,4 +1,4 @@
-# Language Processors 2015 CW - bak14
+# MIPS GNU C Compiler
 
 --- 
 
